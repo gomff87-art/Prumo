@@ -1,17 +1,17 @@
 package com.zerovisual.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.zerovisual.ZeroVisualClient;
 import com.zerovisual.module.impl.cosmetics.TotemPop;
 import com.zerovisual.module.impl.visuals.AspectRatio;
 import com.zerovisual.module.impl.visuals.MotionBlur;
 import com.zerovisual.module.impl.visuals.NoHurtCam;
 import com.zerovisual.module.impl.visuals.Zoom;
-import net.minecraft.class_1799;
-import net.minecraft.class_4587;
-import net.minecraft.class_757;
-import net.minecraft.class_9334;
-import net.minecraft.class_9779;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -19,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin({class_757.class})
+@Mixin({GameRenderer.class})
 public class GameRendererMixin {
    @ModifyReturnValue(
       method = {"getFov"},
@@ -48,7 +48,7 @@ public class GameRendererMixin {
       at = {@At("HEAD")},
       cancellable = true
    )
-   private void zerovisual$noHurtCam(class_4587 matrices, float tickDelta, CallbackInfo ci) {
+   private void zerovisual$noHurtCam(PoseStack matrices, float tickDelta, CallbackInfo ci) {
       if (((NoHurtCam)ZeroVisualClient.get().modules().get(NoHurtCam.class)).isEnabled()) {
          ci.cancel();
       }
@@ -62,7 +62,7 @@ public class GameRendererMixin {
          shift = Shift.AFTER
       )}
    )
-   private void zerovisual$motionBlur(class_9779 tickCounter, boolean tick, CallbackInfo ci) {
+   private void zerovisual$motionBlur(DeltaTracker tickCounter, boolean tick, CallbackInfo ci) {
       MotionBlur motionBlur = (MotionBlur)ZeroVisualClient.get().modules().get(MotionBlur.class);
       if (motionBlur.isEnabled()) {
          motionBlur.apply();
@@ -74,8 +74,8 @@ public class GameRendererMixin {
       at = {@At("HEAD")},
       cancellable = true
    )
-   private void zerovisual$totemPop(class_1799 stack, CallbackInfo ci) {
-      if (stack.method_57826(class_9334.field_54274) && ((TotemPop)ZeroVisualClient.get().modules().get(TotemPop.class)).replacesFloatingItem()) {
+   private void zerovisual$totemPop(ItemStack stack, CallbackInfo ci) {
+      if (stack.has(DataComponents.DEATH_PROTECTION) && ((TotemPop)ZeroVisualClient.get().modules().get(TotemPop.class)).replacesFloatingItem()) {
          ci.cancel();
       }
    }

@@ -2,13 +2,13 @@ package com.zerovisual.mixin;
 
 import com.zerovisual.ZeroVisualClient;
 import com.zerovisual.module.impl.visuals.CustomSky;
-import net.minecraft.class_761;
+import net.minecraft.client.renderer.LevelRenderer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin({class_761.class})
+@Mixin({LevelRenderer.class})
 public class WorldRendererMixin {
    @Inject(
       method = {"renderClouds"},

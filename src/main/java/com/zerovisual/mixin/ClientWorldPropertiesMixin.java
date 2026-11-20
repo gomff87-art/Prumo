@@ -2,13 +2,13 @@ package com.zerovisual.mixin;
 
 import com.zerovisual.ZeroVisualClient;
 import com.zerovisual.module.impl.visuals.TimeChanger;
-import net.minecraft.class_638.class_5271;
+import net.minecraft.client.multiplayer.ClientLevel.ClientLevelData;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin({class_5271.class})
+@Mixin({ClientLevelData.class})
 public class ClientWorldPropertiesMixin {
    @Inject(
       method = {"getTimeOfDay"},

@@ -45,7 +45,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents.Disconnect;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents.Join;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents.AfterEntities;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents.BlockOutline;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents.End;
@@ -54,13 +54,13 @@ import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.AfterInit;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.AfterRender;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
-import net.minecraft.class_1269;
-import net.minecraft.class_2561;
-import net.minecraft.class_310;
-import net.minecraft.class_4185;
-import net.minecraft.class_433;
-import net.minecraft.class_442;
-import net.minecraft.class_500;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.PauseScreen;
+import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,7 +95,7 @@ public class ZeroVisualClient implements ClientModInitializer {
       ScreenEvents.AFTER_INIT
          .register(
             (AfterInit)(client, screen, scaledWidth, scaledHeight) -> {
-               if (screen instanceof class_442 && (Boolean)((MainMenu)this.modules.get(MainMenu.class)).accountButton.get()) {
+               if (screen instanceof TitleScreen && (Boolean)((MainMenu)this.modules.get(MainMenu.class)).accountButton.get()) {
                   Screens.getButtons(screen).add(new AccountButton(screen, 6, 6));
                }
 
@@ -104,43 +104,45 @@ public class ZeroVisualClient implements ClientModInitializer {
                }
 
                if (((PlayWithFriends)this.modules.get(PlayWithFriends.class)).isEnabled()) {
-                  if (screen instanceof class_433 && client.method_1496()) {
+                  if (screen instanceof PauseScreen && client.hasSingleplayerServer()) {
                      Screens.getButtons(screen)
                         .add(
-                           class_4185.method_46430(
-                                 class_2561.method_48321("zerovisual.pwf.button_host", "Play with friends"), b -> client.method_1507(PwfScreen.host(screen))
+                           Button.builder(
+                                 Component.translatableWithFallback("zerovisual.pwf.button_host", "Play with friends"),
+                                 b -> client.setScreen(PwfScreen.host(screen))
                               )
-                              .method_46434(scaledWidth - 136, 6, 130, 20)
-                              .method_46431()
+                              .bounds(scaledWidth - 136, 6, 130, 20)
+                              .build()
                         );
                   }
 
-                  if (screen instanceof class_500) {
+                  if (screen instanceof JoinMultiplayerScreen) {
                      Screens.getButtons(screen)
                         .add(
-                           class_4185.method_46430(
-                                 class_2561.method_48321("zerovisual.pwf.button_join", "Join a friend"), b -> client.method_1507(PwfScreen.join(screen))
+                           Button.builder(
+                                 Component.translatableWithFallback("zerovisual.pwf.button_join", "Join a friend"),
+                                 b -> client.setScreen(PwfScreen.join(screen))
                               )
-                              .method_46434(scaledWidth - 136, 6, 130, 20)
-                              .method_46431()
+                              .bounds(scaledWidth - 136, 6, 130, 20)
+                              .build()
                         );
                   }
                }
 
-               if (screen instanceof class_442) {
+               if (screen instanceof TitleScreen) {
                   ScreenEvents.afterRender(screen)
-                     .register((AfterRender)(s2, ctx, mouseX, mouseY, delta) -> BuildVerifier.renderTitleWarning(ctx, s2.field_22789, s2.field_22790));
+                     .register((AfterRender)(s2, ctx, mouseX, mouseY, delta) -> BuildVerifier.renderTitleWarning(ctx, s2.width, s2.height));
                }
             }
          );
       ClientTickEvents.END_CLIENT_TICK.register((EndTick)client -> this.modules.onTick());
       ClientPlayConnectionEvents.DISCONNECT.register((Disconnect)(handler, client) -> PwfManager.closeHosted());
       HudRenderCallback.EVENT.register((HudRenderCallback)(ctx, tickCounter) -> {
-         class_310 mc = class_310.method_1551();
-         if (!mc.field_1690.field_1842 && !mc.field_1705.method_53531().method_53536()) {
-            ctx.method_51448().method_22903();
-            ctx.method_51448().method_46416(0.0F, 0.0F, 200.0F);
-            this.modules.renderHud(ctx, tickCounter.method_60637(false));
+         Minecraft mc = Minecraft.getInstance();
+         if (!mc.options.hideGui && !mc.gui.getDebugOverlay().showDebugScreen()) {
+            ctx.method_51448().pushPose();
+            ctx.method_51448().translate(0.0F, 0.0F, 200.0F);
+            this.modules.renderHud(ctx, tickCounter.getGameTimeDeltaPartialTick(false));
             AutoTool autoTool = (AutoTool)this.modules.get(AutoTool.class);
             if (autoTool.isEnabled()) {
                autoTool.render(ctx);
@@ -157,7 +159,7 @@ public class ZeroVisualClient implements ClientModInitializer {
                totemPop.renderHud(ctx);
             }
 
-            ctx.method_51448().method_22909();
+            ctx.method_51448().popPose();
          }
       });
       WorldRenderEvents.AFTER_ENTITIES.register((AfterEntities)context -> {
@@ -251,7 +253,7 @@ public class ZeroVisualClient implements ClientModInitializer {
             }
          );
       AttackEntityCallback.EVENT.register((AttackEntityCallback)(player, world, hand, entity, hitResult) -> {
-         if (world.field_9236) {
+         if (world.isClientSide) {
             TargetTracker.onAttack(entity);
             HitParticles hitParticles = (HitParticles)this.modules.get(HitParticles.class);
             if (hitParticles.isEnabled()) {
@@ -264,7 +266,7 @@ public class ZeroVisualClient implements ClientModInitializer {
             }
          }
 
-         return class_1269.field_5811;
+         return InteractionResult.PASS;
       });
       ClientLifecycleEvents.CLIENT_STOPPING.register((ClientStopping)client -> this.config.save());
       LOGGER.info("{} initialized with {} modules", "prumo visuals", this.modules.getModules().size());

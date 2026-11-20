@@ -4,11 +4,11 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.zerovisual.ZeroVisualClient;
 import com.zerovisual.module.impl.visuals.Freelook;
-import net.minecraft.class_4184;
+import net.minecraft.client.Camera;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-@Mixin({class_4184.class})
+@Mixin({Camera.class})
 public class CameraMixin {
    @WrapOperation(
       method = {"update"},
@@ -22,7 +22,7 @@ public class CameraMixin {
          ordinal = 1
       )}
    )
-   private void zerovisual$freelook(class_4184 camera, float yaw, float pitch, Operation<Void> original) {
+   private void zerovisual$freelook(Camera camera, float yaw, float pitch, Operation<Void> original) {
       ZeroVisualClient client = ZeroVisualClient.get();
       Freelook freelook = client != null ? (Freelook)client.modules().get(Freelook.class) : null;
       if (freelook != null && freelook.isActive()) {

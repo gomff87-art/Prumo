@@ -1,13 +1,13 @@
 package com.zerovisual.mixin;
 
 import com.zerovisual.util.ShieldOverlayHolder;
-import net.minecraft.class_10444;
+import net.minecraft.client.renderer.item.ItemStackRenderState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
-@Mixin({class_10444.class})
+@Mixin({ItemStackRenderState.class})
 public class ItemRenderStateMixin implements ShieldOverlayHolder {
    @Unique
    private int zerovisual$shieldOverlay = -1;

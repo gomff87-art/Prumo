@@ -2,11 +2,11 @@ package com.zerovisual.mixin;
 
 import com.zerovisual.emote.EmotePose;
 import com.zerovisual.util.EmoteState;
-import net.minecraft.class_10055;
+import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
-@Mixin({class_10055.class})
+@Mixin({AvatarRenderState.class})
 public class PlayerEntityRenderStateMixin implements EmoteState {
    @Unique
    private final EmotePose zerovisual$pose = new EmotePose();

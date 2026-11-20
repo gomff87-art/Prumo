@@ -3,10 +3,10 @@ package com.zerovisual.mixin;
 import com.zerovisual.ZeroVisualClient;
 import com.zerovisual.module.impl.cosmetics.TotemPop;
 import com.zerovisual.module.impl.visuals.ShieldColor;
-import net.minecraft.class_1297;
-import net.minecraft.class_2663;
-import net.minecraft.class_634;
-import net.minecraft.class_638;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.network.protocol.game.ClientboundEntityEventPacket;
+import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -14,10 +14,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin({class_634.class})
+@Mixin({ClientPacketListener.class})
 public class ClientPlayNetworkHandlerMixin {
    @Shadow
-   private class_638 field_3699;
+   private ClientLevel field_3699;
 
    @Inject(
       method = {"onEntityStatus"},
@@ -27,15 +27,15 @@ public class ClientPlayNetworkHandlerMixin {
          shift = Shift.AFTER
       )}
    )
-   private void zerovisual$totemPop(class_2663 packet, CallbackInfo ci) {
+   private void zerovisual$totemPop(ClientboundEntityEventPacket packet, CallbackInfo ci) {
       if (this.field_3699 != null) {
-         if (packet.method_11470() == 35) {
-            class_1297 entity = packet.method_11469(this.field_3699);
+         if (packet.getEventId() == 35) {
+            Entity entity = packet.getEntity(this.field_3699);
             if (entity != null) {
                ((TotemPop)ZeroVisualClient.get().modules().get(TotemPop.class)).onPop(entity);
             }
-         } else if (packet.method_11470() == 30) {
-            class_1297 entity = packet.method_11469(this.field_3699);
+         } else if (packet.getEventId() == 30) {
+            Entity entity = packet.getEntity(this.field_3699);
             if (entity != null) {
                ((ShieldColor)ZeroVisualClient.get().modules().get(ShieldColor.class)).onShieldBreak(entity);
             }

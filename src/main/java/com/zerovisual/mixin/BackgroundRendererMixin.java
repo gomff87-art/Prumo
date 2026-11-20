@@ -4,14 +4,14 @@ import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.zerovisual.ZeroVisualClient;
 import com.zerovisual.module.impl.visuals.Ambience;
 import com.zerovisual.module.impl.visuals.CustomSky;
-import net.minecraft.class_310;
-import net.minecraft.class_758;
 import net.minecraft.class_5294.class_5401;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.fog.FogRenderer;
 import org.joml.Vector4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-@Mixin({class_758.class})
+@Mixin({FogRenderer.class})
 public class BackgroundRendererMixin {
    @ModifyReturnValue(
       method = {"getFogColor"},
@@ -25,7 +25,7 @@ public class BackgroundRendererMixin {
          CustomSky sky = (CustomSky)client.modules().get(CustomSky.class);
          if (sky.isActive()
             && !((Ambience)client.modules().get(Ambience.class)).isEnabled()
-            && class_310.method_1551().field_1687.method_28103().method_29992() == class_5401.field_25640) {
+            && Minecraft.getInstance().level.method_28103().method_29992() == class_5401.field_25640) {
             float[] fog = sky.fogColor();
             return new Vector4f(fog[0], fog[1], fog[2], color.w);
          } else {

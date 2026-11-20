@@ -6,9 +6,9 @@ import com.zerovisual.render.Render2D;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.AfterInit;
-import net.minecraft.class_332;
-import net.minecraft.class_437;
-import net.minecraft.class_442;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.TitleScreen;
 
 public class IntroHook implements ClientModInitializer {
    private static final String NAME = "PRUMO VISUAL";
@@ -19,7 +19,7 @@ public class IntroHook implements ClientModInitializer {
 
    public void onInitializeClient() {
       ScreenEvents.AFTER_INIT.register((AfterInit)(var0, var1, var2, var3) -> {
-         if (!finished && !attached && var1 instanceof class_442) {
+         if (!finished && !attached && var1 instanceof TitleScreen) {
             attached = true;
             startedAt = System.currentTimeMillis();
             ScreenEvents.afterRender(var1).register(IntroHook::draw);
@@ -36,7 +36,7 @@ public class IntroHook implements ClientModInitializer {
       return 1.0F - var1 * var1 * var1;
    }
 
-   private static void draw(class_437 var0, class_332 var1, int var2, int var3, float var4) {
+   private static void draw(Screen var0, GuiGraphics var1, int var2, int var3, float var4) {
       if (!finished) {
          try {
             long var5 = System.currentTimeMillis() - startedAt;
@@ -45,12 +45,12 @@ public class IntroHook implements ClientModInitializer {
                return;
             }
 
-            int var7 = var0.field_22789;
-            int var8 = var0.field_22790;
+            int var7 = var0.width;
+            int var8 = var0.height;
             float var9 = 1.0F - clamp((float)(var5 - 2900L) / 700.0F);
             float var10 = clamp((float)var5 / 250.0F);
             float var11 = Math.min(var10, var9);
-            var1.method_25294(0, 0, var7, var8, ColorUtil.withAlpha(-16119278, var11));
+            var1.fill(0, 0, var7, var8, ColorUtil.withAlpha(-16119278, var11));
             int var12 = Theme.accent();
             int var13 = Theme.accentLight();
             float var14 = (float)var7 / 2.0F;

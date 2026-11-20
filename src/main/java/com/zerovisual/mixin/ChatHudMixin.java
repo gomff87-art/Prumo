@@ -8,13 +8,13 @@ import com.zerovisual.ZeroVisualClient;
 import com.zerovisual.module.impl.hud.ChatHeads;
 import com.zerovisual.module.impl.hud.ChatTweaks;
 import java.util.List;
-import net.minecraft.class_2561;
-import net.minecraft.class_303;
-import net.minecraft.class_327;
-import net.minecraft.class_332;
-import net.minecraft.class_338;
-import net.minecraft.class_5481;
-import net.minecraft.class_303.class_7590;
+import net.minecraft.client.GuiMessage;
+import net.minecraft.client.GuiMessage.Line;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.ChatComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.FormattedCharSequence;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -25,11 +25,11 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin({class_338.class})
+@Mixin({ChatComponent.class})
 public class ChatHudMixin {
    @Shadow
    @Final
-   private List<class_7590> field_2064;
+   private List<Line> field_2064;
    @Unique
    private int zerovisual$lineCount;
 
@@ -49,7 +49,7 @@ public class ChatHudMixin {
       at = {@At("HEAD")},
       argsOnly = true
    )
-   private class_2561 zerovisual$timestamp(class_2561 message) {
+   private Component zerovisual$timestamp(Component message) {
       ChatTweaks tweaks = zerovisual$tweaks();
       return tweaks != null && tweaks.timestamps.get() ? tweaks.addTimestamp(message) : message;
    }
@@ -79,15 +79,15 @@ public class ChatHudMixin {
          ordinal = 1
       )}
    )
-   private void zerovisual$slideFill(class_332 context, int x1, int y1, int x2, int y2, int color, Operation<Void> original, @Local class_7590 line) {
+   private void zerovisual$slideFill(GuiGraphics context, int x1, int y1, int x2, int y2, int color, Operation<Void> original, @Local Line line) {
       float offset = zerovisual$offset(line);
       if (offset == 0.0F) {
          original.call(new Object[]{context, x1, y1, x2, y2, color});
       } else {
-         context.method_51448().method_22903();
-         context.method_51448().method_46416(offset, 0.0F, 0.0F);
+         context.method_51448().pushPose();
+         context.method_51448().translate(offset, 0.0F, 0.0F);
          original.call(new Object[]{context, x1, y1, x2, y2, zerovisual$fade(color, offset)});
-         context.method_51448().method_22909();
+         context.method_51448().popPose();
       }
    }
 
@@ -99,7 +99,7 @@ public class ChatHudMixin {
       )}
    )
    private int zerovisual$slideText(
-      class_332 context, class_327 renderer, class_5481 text, int x, int y, int color, Operation<Integer> original, @Local class_7590 line
+      GuiGraphics context, Font renderer, FormattedCharSequence text, int x, int y, int color, Operation<Integer> original, @Local Line line
    ) {
       float offset = zerovisual$offset(line);
       ChatHeads heads = zerovisual$heads();
@@ -107,11 +107,11 @@ public class ChatHudMixin {
          return (Integer)original.call(new Object[]{context, renderer, text, x, y, color});
       } else {
          int shown = offset == 0.0F ? color : zerovisual$fade(color, offset);
-         context.method_51448().method_22903();
-         context.method_51448().method_46416(offset, 0.0F, 0.0F);
+         context.method_51448().pushPose();
+         context.method_51448().translate(offset, 0.0F, 0.0F);
          int shift = heads != null ? heads.drawHead(context, line, y, shown) : 0;
          int result = (Integer)original.call(new Object[]{context, renderer, text, x + shift, y, shown});
-         context.method_51448().method_22909();
+         context.method_51448().popPose();
          return result;
       }
    }
@@ -120,10 +120,10 @@ public class ChatHudMixin {
       method = {"addVisibleMessage"},
       at = {@At("HEAD")}
    )
-   private void zerovisual$headsBegin(class_303 message, CallbackInfo ci) {
+   private void zerovisual$headsBegin(GuiMessage message, CallbackInfo ci) {
       ChatHeads heads = zerovisual$heads();
       if (heads != null) {
-         heads.beginMessage(message.comp_893());
+         heads.beginMessage(message.content());
       }
    }
 
@@ -147,7 +147,7 @@ public class ChatHudMixin {
          target = "Lnet/minecraft/client/util/ChatMessages;breakRenderedChatMessageLines(Lnet/minecraft/text/StringVisitable;ILnet/minecraft/client/font/TextRenderer;)Ljava/util/List;"
       )}
    )
-   private List<class_5481> zerovisual$headsLines(List<class_5481> lines) {
+   private List<FormattedCharSequence> zerovisual$headsLines(List<FormattedCharSequence> lines) {
       this.zerovisual$lineCount = lines.size();
       return lines;
    }
@@ -156,7 +156,7 @@ public class ChatHudMixin {
       method = {"addVisibleMessage"},
       at = {@At("RETURN")}
    )
-   private void zerovisual$headsEnd(class_303 message, CallbackInfo ci) {
+   private void zerovisual$headsEnd(GuiMessage message, CallbackInfo ci) {
       ChatHeads heads = zerovisual$heads();
       if (heads != null) {
          heads.endMessage(this.field_2064, this.zerovisual$lineCount);
@@ -175,7 +175,7 @@ public class ChatHudMixin {
    }
 
    @Unique
-   private static float zerovisual$offset(class_7590 line) {
+   private static float zerovisual$offset(Line line) {
       ChatTweaks tweaks = zerovisual$tweaks();
       return tweaks != null && line != null ? tweaks.lineOffset(line) : 0.0F;
    }

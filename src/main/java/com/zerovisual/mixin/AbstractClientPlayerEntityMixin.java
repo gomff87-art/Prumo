@@ -3,20 +3,20 @@ package com.zerovisual.mixin;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.zerovisual.ZeroVisualClient;
 import com.zerovisual.module.impl.cosmetics.Cape;
-import net.minecraft.class_310;
-import net.minecraft.class_742;
-import net.minecraft.class_8685;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.world.entity.player.PlayerSkin;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-@Mixin({class_742.class})
+@Mixin({AbstractClientPlayer.class})
 public class AbstractClientPlayerEntityMixin {
    @ModifyReturnValue(
       method = {"getSkinTextures"},
       at = {@At("RETURN")}
    )
-   private class_8685 zerovisual$cape(class_8685 textures) {
-      if (this != class_310.method_1551().field_1724) {
+   private PlayerSkin zerovisual$cape(PlayerSkin textures) {
+      if (this != Minecraft.getInstance().player) {
          return textures;
       } else {
          ZeroVisualClient client = ZeroVisualClient.get();

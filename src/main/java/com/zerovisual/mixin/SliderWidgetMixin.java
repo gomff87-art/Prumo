@@ -4,18 +4,18 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.zerovisual.gui.ButtonStyle;
 import java.util.function.Function;
-import net.minecraft.class_1921;
-import net.minecraft.class_2561;
-import net.minecraft.class_2960;
-import net.minecraft.class_332;
-import net.minecraft.class_339;
-import net.minecraft.class_357;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractSliderButton;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-@Mixin({class_357.class})
-public abstract class SliderWidgetMixin extends class_339 {
-   public SliderWidgetMixin(int x, int y, int width, int height, class_2561 message) {
+@Mixin({AbstractSliderButton.class})
+public abstract class SliderWidgetMixin extends AbstractWidget {
+   public SliderWidgetMixin(int x, int y, int width, int height, Component message) {
       super(x, y, width, height, message);
    }
 
@@ -28,12 +28,12 @@ public abstract class SliderWidgetMixin extends class_339 {
       )}
    )
    private void zerovisual$track(
-      class_332 context, Function<class_2960, class_1921> layers, class_2960 sprite, int x, int y, int width, int height, int color, Operation<Void> original
+      GuiGraphics context, Function<Identifier, RenderType> layers, Identifier sprite, int x, int y, int width, int height, int color, Operation<Void> original
    ) {
       if (!ButtonStyle.isEnabled()) {
          original.call(new Object[]{context, layers, sprite, x, y, width, height, color});
       } else {
-         ButtonStyle.drawSliderTrack(context, (float)x, (float)y, (float)width, (float)height, this.field_22763, this.field_22765);
+         ButtonStyle.drawSliderTrack(context, (float)x, (float)y, (float)width, (float)height, this.active, this.alpha);
       }
    }
 
@@ -46,12 +46,12 @@ public abstract class SliderWidgetMixin extends class_339 {
       )}
    )
    private void zerovisual$handle(
-      class_332 context, Function<class_2960, class_1921> layers, class_2960 sprite, int x, int y, int width, int height, int color, Operation<Void> original
+      GuiGraphics context, Function<Identifier, RenderType> layers, Identifier sprite, int x, int y, int width, int height, int color, Operation<Void> original
    ) {
       if (!ButtonStyle.isEnabled()) {
          original.call(new Object[]{context, layers, sprite, x, y, width, height, color});
       } else {
-         ButtonStyle.drawSliderHandle(context, (float)x, (float)y, (float)width, (float)height, this.method_25367(), this.field_22765);
+         ButtonStyle.drawSliderHandle(context, (float)x, (float)y, (float)width, (float)height, this.isHoveredOrFocused(), this.alpha);
       }
    }
 }

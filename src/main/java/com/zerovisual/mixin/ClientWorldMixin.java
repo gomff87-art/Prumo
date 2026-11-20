@@ -3,11 +3,11 @@ package com.zerovisual.mixin;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.zerovisual.ZeroVisualClient;
 import com.zerovisual.module.impl.visuals.Ambience;
-import net.minecraft.class_638;
+import net.minecraft.client.multiplayer.ClientLevel;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-@Mixin({class_638.class})
+@Mixin({ClientLevel.class})
 public class ClientWorldMixin {
    @ModifyReturnValue(
       method = {"getSkyColor"},

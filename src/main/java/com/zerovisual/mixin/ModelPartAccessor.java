@@ -2,25 +2,25 @@ package com.zerovisual.mixin;
 
 import java.util.List;
 import java.util.Map;
-import net.minecraft.class_630;
-import net.minecraft.class_630.class_628;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.geom.ModelPart.Cube;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin({class_630.class})
+@Mixin({ModelPart.class})
 public interface ModelPartAccessor {
    @Accessor("cuboids")
-   List<class_628> zerovisual$getCuboids();
+   List<Cube> zerovisual$getCuboids();
 
    @Mutable
    @Accessor("cuboids")
-   void zerovisual$setCuboids(List<class_628> var1);
+   void zerovisual$setCuboids(List<Cube> var1);
 
    @Accessor("children")
-   Map<String, class_630> zerovisual$getChildren();
+   Map<String, ModelPart> zerovisual$getChildren();
 
    @Mutable
    @Accessor("children")
-   void zerovisual$setChildren(Map<String, class_630> var1);
+   void zerovisual$setChildren(Map<String, ModelPart> var1);
 }

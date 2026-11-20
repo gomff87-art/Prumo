@@ -4,10 +4,10 @@ import com.zerovisual.module.impl.cosmetics.Pet;
 import com.zerovisual.util.EmoteRig;
 import com.zerovisual.util.EmoteRigHolder;
 import com.zerovisual.util.EmoteState;
-import net.minecraft.class_10034;
-import net.minecraft.class_3532;
-import net.minecraft.class_572;
-import net.minecraft.class_630;
+import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
+import net.minecraft.util.Mth;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -16,28 +16,28 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin({class_572.class})
+@Mixin({HumanoidModel.class})
 public class BipedEntityModelMixin implements EmoteRigHolder {
    @Unique
    private EmoteRig zerovisual$rig;
    @Shadow
    @Final
-   public class_630 field_3398;
+   public ModelPart field_3398;
    @Shadow
    @Final
-   public class_630 field_3391;
+   public ModelPart field_3391;
    @Shadow
    @Final
-   public class_630 field_3401;
+   public ModelPart field_3401;
    @Shadow
    @Final
-   public class_630 field_27433;
+   public ModelPart field_27433;
    @Shadow
    @Final
-   public class_630 field_3392;
+   public ModelPart field_3392;
    @Shadow
    @Final
-   public class_630 field_3397;
+   public ModelPart field_3397;
 
    public EmoteRig zerovisual$rig() {
       return this.zerovisual$rig;
@@ -47,11 +47,11 @@ public class BipedEntityModelMixin implements EmoteRigHolder {
       method = {"setAngles(Lnet/minecraft/client/render/entity/state/BipedEntityRenderState;)V"},
       at = {@At("TAIL")}
    )
-   private void zerovisual$emote(class_10034 state, CallbackInfo ci) {
+   private void zerovisual$emote(HumanoidRenderState state, CallbackInfo ci) {
       if (state instanceof EmoteState emote) {
          float weight = emote.zerovisual$weight();
          if (weight > 0.0F && this.zerovisual$rig == null) {
-            this.zerovisual$rig = new EmoteRig((class_572)this);
+            this.zerovisual$rig = new EmoteRig((HumanoidModel)this);
          }
 
          if (this.zerovisual$rig != null) {
@@ -67,7 +67,7 @@ public class BipedEntityModelMixin implements EmoteRigHolder {
       method = {"copyTransforms"},
       at = {@At("TAIL")}
    )
-   private void zerovisual$emoteArmor(class_572<?> target, CallbackInfo ci) {
+   private void zerovisual$emoteArmor(HumanoidModel<?> target, CallbackInfo ci) {
       if (this.zerovisual$rig != null) {
          EmoteRigHolder holder = (EmoteRigHolder)target;
          if (holder.zerovisual$rig() == null) {
@@ -82,34 +82,34 @@ public class BipedEntityModelMixin implements EmoteRigHolder {
       method = {"setAngles(Lnet/minecraft/client/render/entity/state/BipedEntityRenderState;)V"},
       at = {@At("TAIL")}
    )
-   private void zerovisual$miniMeIdle(class_10034 state, CallbackInfo ci) {
+   private void zerovisual$miniMeIdle(HumanoidRenderState state, CallbackInfo ci) {
       if (state == Pet.posedState && !(Pet.poseBlend <= 0.001F)) {
          float k = Pet.poseBlend;
          float t = Pet.poseTime;
          switch (Pet.poseAnimation) {
             case 0:
-               float swing = class_3532.method_15374(t * 5.2F);
-               this.field_3401.field_3654 += (swing * 0.75F - 0.15F) * k;
-               this.field_27433.field_3654 += (swing * 0.75F - 0.15F) * k;
-               this.field_3401.field_3674 = this.field_3401.field_3674 + (0.12F + Math.abs(swing) * 0.1F) * k;
-               this.field_27433.field_3674 = this.field_27433.field_3674 - (0.12F + Math.abs(swing) * 0.1F) * k;
-               this.field_3398.field_3674 = this.field_3398.field_3674 + class_3532.method_15374(t * 5.2F) * 0.07F * k;
-               this.field_3398.field_3654 = this.field_3398.field_3654 + Math.abs(class_3532.method_15362(t * 5.2F)) * 0.06F * k;
+               float swing = Mth.method_15374(t * 5.2F);
+               this.field_3401.xRot += (swing * 0.75F - 0.15F) * k;
+               this.field_27433.xRot += (swing * 0.75F - 0.15F) * k;
+               this.field_3401.zRot = this.field_3401.zRot + (0.12F + Math.abs(swing) * 0.1F) * k;
+               this.field_27433.zRot = this.field_27433.zRot - (0.12F + Math.abs(swing) * 0.1F) * k;
+               this.field_3398.zRot = this.field_3398.zRot + Mth.method_15374(t * 5.2F) * 0.07F * k;
+               this.field_3398.xRot = this.field_3398.xRot + Math.abs(Mth.method_15362(t * 5.2F)) * 0.06F * k;
                break;
             case 1:
-               float beat = Math.max(0.0F, class_3532.method_15374(t * 9.0F));
-               this.field_3392.field_3654 += -beat * 0.32F * k;
-               this.field_3392.field_3674 += 0.06F * k;
-               this.field_3391.field_3674 = this.field_3391.field_3674 + class_3532.method_15374(t * 4.5F) * 0.035F * k;
-               this.field_3398.field_3674 = this.field_3398.field_3674 + class_3532.method_15374(t * 4.5F) * 0.06F * k;
-               this.field_3401.field_3674 += (0.1F + beat * 0.05F) * k;
-               this.field_27433.field_3674 -= (0.1F + beat * 0.05F) * k;
+               float beat = Math.max(0.0F, Mth.method_15374(t * 9.0F));
+               this.field_3392.xRot += -beat * 0.32F * k;
+               this.field_3392.zRot += 0.06F * k;
+               this.field_3391.zRot = this.field_3391.zRot + Mth.method_15374(t * 4.5F) * 0.035F * k;
+               this.field_3398.zRot = this.field_3398.zRot + Mth.method_15374(t * 4.5F) * 0.06F * k;
+               this.field_3401.zRot += (0.1F + beat * 0.05F) * k;
+               this.field_27433.zRot -= (0.1F + beat * 0.05F) * k;
                break;
             case 2:
-               this.field_3401.field_3654 += 0.25F * k;
-               this.field_27433.field_3654 += 0.25F * k;
-               this.field_3392.field_3675 = this.field_3392.field_3675 + class_3532.method_15374(t * 2.0F) * 0.08F * k;
-               this.field_3397.field_3675 = this.field_3397.field_3675 - class_3532.method_15374(t * 2.0F) * 0.08F * k;
+               this.field_3401.xRot += 0.25F * k;
+               this.field_27433.xRot += 0.25F * k;
+               this.field_3392.yRot = this.field_3392.yRot + Mth.method_15374(t * 2.0F) * 0.08F * k;
+               this.field_3397.yRot = this.field_3397.yRot - Mth.method_15374(t * 2.0F) * 0.08F * k;
          }
       }
    }

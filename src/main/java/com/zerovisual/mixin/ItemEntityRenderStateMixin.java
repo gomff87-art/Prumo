@@ -1,11 +1,11 @@
 package com.zerovisual.mixin;
 
 import com.zerovisual.util.ItemPhysicsState;
-import net.minecraft.class_10039;
+import net.minecraft.client.renderer.entity.state.ItemEntityRenderState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
-@Mixin({class_10039.class})
+@Mixin({ItemEntityRenderState.class})
 public class ItemEntityRenderStateMixin implements ItemPhysicsState {
    @Unique
    private boolean zerovisual$onGround;
