@@ -18,5 +18,5 @@ jobs:
       - run: gradle build
       - uses: actions/upload-artifact@v4
         with:
-          name: lokivisuals-jar
+          name: prumoVisual-jar
           path: build/libs/*.jar
