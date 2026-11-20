@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import src/main/java/com/zerovisuals/account/AccountManager.java;
+import com.zerovisuals.account.AccountManager; 
 import com.zerovisual.ZeroVisualClient;
 import com.zerovisual.mixin.MinecraftClientAccessor;
 import net.fabricmc.loader.api.FabricLoader;
