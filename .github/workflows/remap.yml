@@ -1,0 +1,45 @@
+name: Remap
+on: workflow_dispatch
+permissions:
+  contents: write
+jobs:
+  remap:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 25
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: current
+      - run: |
+          mkdir -p work/z work/pack
+          unzip -q zero.zip -d work/z
+          rm -rf work/z/__MACOSX
+          J=$(find work/z -type d -path '*src/main/java' | head -1)
+          R=$(find work/z -type d -path '*src/main/resources' | head -1)
+          cp -r "$J"/. work/pack/
+          if [ -n "$R" ]; then cp -r "$R"/. work/pack/; fi
+          (cd work/pack && zip -qr ../zero-in.jar .)
+          echo "dependencies { modImplementation files('work/zero-in.jar') }" >> build.gradle
+          gradle --no-daemon dependencies --configuration compileClasspath || true
+          OUT=$(find . "$HOME/.gradle" -path '*remapped_mods*' -path '*zero-in*' -name '*.jar' | head -1)
+          echo "Remapped: $OUT"
+          test -n "$OUT"
+          mkdir -p work/named work/dec
+          unzip -q "$OUT" -d work/named
+          curl -L https://repo1.maven.org/maven2/org/vineflower/vineflower/1.10.1/vineflower-1.10.1.jar -o vf.jar
+          java -jar vf.jar work/named work/dec/
+          git checkout build.gradle
+          grep -rlE 'class_[0-9]+|method_[0-9]+|field_[0-9]+' src/main/java | xargs -r rm
+          find src -name '*.class' -delete
+          cp -rn work/dec/. src/main/java/
+          rm -f zero.zip
+          git config user.name "bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add src
+          git add -u
+          git commit -m "Remap"
+          git push
